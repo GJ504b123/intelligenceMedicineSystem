@@ -1,51 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { BarChart2, FileCheck, X, Check, Bell, Search } from 'lucide-react';
+import { 
+  BarChart2, FileCheck, X, Check, Bell, Search, 
+  LayoutDashboard, ShieldCheck, Database, RefreshCw, Clock
+} from 'lucide-react';
 import { useContext } from 'react';
 import { AuthContext } from '@/contexts/authContext';
-
-// 类型定义
-interface VerificationRecord {
-  id: string;
-  time: string;
-  fileName: string;
-  result: 'pass' | 'fail';
-}
-
-// 模拟验证记录数据
-const verificationRecords: VerificationRecord[] = [
-  {
-    id: '1',
-    time: '2025-01-15 14:30',
-    fileName: '病历报告.pdf',
-    result: 'pass'
-  },
-  {
-    id: '2',
-    time: '2025-01-15 14:25',
-    fileName: '口腔影像.jpg',
-    result: 'pass'
-  },
-  {
-    id: '3',
-    time: '2025-01-15 14:20',
-    fileName: '诊断证明.pdf',
-    result: 'fail'
-  },
-  {
-    id: '4',
-    time: '2025-01-15 14:15',
-    fileName: '检查报告.pdf',
-    result: 'pass'
-  },
-  {
-    id: '5',
-    time: '2025-01-15 14:10',
-    fileName: '处方单.jpg',
-    result: 'pass'
-  }
-];
 
 // 统计数据
 const statsData = {
@@ -56,246 +17,181 @@ const statsData = {
   failRate: 7.1
 };
 
+// 验证记录
+const verificationRecords = [
+  { id: '1', time: '14:30', fileName: '病历报告_20250115.pdf', result: 'pass', hash: 'e3b0c44...' },
+  { id: '2', time: '14:25', fileName: '口腔影像_Scan.jpg', result: 'pass', hash: 'a1b2c3d...' },
+  { id: '3', time: '14:20', fileName: '诊断证明_篡改测试.pdf', result: 'fail', hash: 'Unknown' },
+];
+
 export default function ThirdPartyVerifyHome() {
   const navigate = useNavigate();
   const { logout } = useContext(AuthContext);
   const [currentDate, setCurrentDate] = useState('');
   
-  // 获取当前日期并格式化
   useEffect(() => {
     const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-    const weekday = weekdays[date.getDay()];
-    
-    setCurrentDate(`${year}年${month}月${day}日 星期${weekday}`);
+    setCurrentDate(`${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`);
   }, []);
-  
-  // 处理导航点击
-  const handleNavClick = (path: string) => {
-    navigate(path);
-    toast(`导航到${path === '/verify' ? '验证中心' : path.substring(7)}`);
-  };
-  
-  // 处理通知点击
-  const handleNotificationClick = () => {
-    toast('您有新的通知');
-  };
-  
-  // 处理验证方式选择
-  const handleVerifyMethodSelect = (method: 'upload' | 'code') => {
-    if (method === 'upload') {
-      toast('请选择要验证的文件');
-      // 实际应用中应该打开文件选择对话框
-    } else {
-      toast('请输入或扫描证书编号');
-      // 实际应用中应该显示证书编号输入框
-    }
-  };
-  
-  // 查看验证详情
-  const handleViewDetails = (recordId: string) => {
-    toast(`查看验证记录 #${recordId} 的详情`);
-  };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* 顶部导航栏 */}
-      <header className="h-[64px] bg-[#1E293B] fixed top-0 left-0 right-0 z-10 shadow-md">
-        <div className="max-w-[1440px] mx-auto h-full px-4 flex items-center justify-between">
-          {/* 左侧 Logo */}
-          {/* <div className="text-2xl font-bold text-white">验证服务中心</div> */}
-          <div className="text-2xl font-bold text-white flex gap-5 items-center"><img src="src/picture/nav.png" style={{width:'100px'}} alt="yidianjiutong"  />医点就通</div>
-          
-          {/* 中间导航菜单 */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <button
-              onClick={() => handleNavClick('/verify')}
-              className="text-white hover:text-white/80 transition-colors border-b-2 border-white"
-            >
-              验证中心
-            </button>
-            <button
-              onClick={() => handleNavClick('/verify/records')}
-              className="text-white/70 hover:text-white transition-colors"
-            >
-              验证记录
-            </button>
-            <button
-              onClick={() => handleNavClick('/verify/statistics')}
-              className="text-white/70 hover:text-white transition-colors"
-            >
-              统计分析
-            </button>
-            <button
-              onClick={() => handleNavClick('/verify/organization')}
-              className="text-white/70 hover:text-white transition-colors"
-            >
-              机构管理
-            </button>
-          </nav>
-          
-          {/* 右侧操作区 */}
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={logout}
-              className="px-3 py-1.5 border border-white/30 text-white rounded hover:bg-white/10 transition-colors text-sm hidden md:block"
-            >
-              退出登录
-            </button>
-            
-            <button 
-              onClick={handleNotificationClick} 
-              className="relative p-2 rounded-full hover:bg-white/20 transition-colors"
-              aria-label="通知"
-            >
-              <Bell className="text-white" size={20} />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-            
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white font-medium">
-              验
-            </div>
+    <div className="flex min-h-screen bg-[#F8FAFC]">
+      {/* 侧边导航栏 - 第三方深色权威主题 */}
+      <aside className="w-[240px] bg-[#1E293B] text-white flex flex-col fixed h-full shadow-xl z-20">
+        <div className="p-6 flex items-center gap-3">
+          <div className="bg-white p-1 rounded-lg">
+            <img src="/src/picture/nav.png" className="w-18 h-8" alt="Logo" />
           </div>
-        </div>
-      </header>
-      
-      {/* 主内容区域 */}
-      <main className="flex-grow pt-[64px] px-[40px] py-[32px] max-w-[1440px] mx-auto w-full">
-        {/* 验证中心标题 */}
-        <div className="mb-8">
-          <h1 className="text-[28px] font-bold text-gray-900">验证中心</h1>
-          <p className="text-gray-600 mt-2">今天是 {currentDate}</p>
+          <span className="text-xl font-bold tracking-tight">医点就通</span>
         </div>
         
-        {/* 今日验证统计 */}
-        <div className="mb-10">
-          <h2 className="text-[18px] font-bold text-gray-900 mb-4">今日验证统计</h2>
-          <div className="flex flex-wrap gap-[24px]">
-            {/* 今日验证总数卡片 */}
-            <div className="w-[360px] h-[160px] bg-white rounded-lg p-6 shadow-md flex flex-col items-center justify-center">
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-3">
+        <nav className="flex-1 px-4 mt-4 space-y-2">
+          {[
+            { name: '验证概览', icon: LayoutDashboard, path: '/verify', active: true },
+            { name: '文件校验', icon: FileCheck, path: '/verify/files' },
+            { name: '证书查询', icon: ShieldCheck, path: '/verify/certificate' },
+            { name: '存证记录', icon: Database, path: '/verify/records' },
+            { name: '统计报表', icon: BarChart2, path: '/verify/statistics' },
+          ].map((item) => (
+            <div 
+              key={item.name} 
+              onClick={() => navigate(item.path)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all ${
+                item.active ? 'bg-white/10 shadow-inner' : 'hover:bg-white/5'
+              }`}
+            >
+              <item.icon size={20} className={item.active ? 'text-white' : 'text-white/60'} />
+              <span className={item.active ? 'font-bold' : 'text-white/80'}>{item.name}</span>
+            </div>
+          ))}
+        </nav>
+        
+        <div className="p-6 border-t border-white/10">
+          <button onClick={logout} className="flex items-center gap-2 text-white/60 hover:text-red-300 transition-colors">
+            <RefreshCw size={18} /> 退出系统
+          </button>
+        </div>
+      </aside>
+
+      {/* 主体内容 */}
+      <main className="flex-1 ml-[240px] p-10">
+        <header className="flex justify-between items-center mb-10">
+          <div>
+            <h1 className="text-3xl font-bold text-[#1E293B]">验证控制台</h1>
+            <p className="text-gray-500 mt-2 flex items-center gap-2">
+              <Clock size={16} /> 区块链节点同步状态：<span className="text-green-600 font-bold">正常</span> · {currentDate}
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <button className="relative p-2 bg-white border border-gray-200 rounded-full hover:bg-gray-50">
+              <Bell size={20} className="text-gray-600" />
+            </button>
+            <div className="px-4 py-2 bg-gray-100 rounded-full text-gray-600 font-medium text-sm">
+              管理员：Admin_01
+            </div>
+          </div>
+        </header>
+
+        {/* 统计卡片 */}
+        <div className="grid grid-cols-3 gap-6 mb-10">
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-gray-500 font-medium">今日验证请求</p>
+                <h3 className="text-4xl font-bold text-[#1E293B] mt-2">{statsData.total}</h3>
+              </div>
+              <div className="p-3 bg-blue-50 text-blue-600 rounded-xl">
                 <BarChart2 size={24} />
               </div>
-              <h3 className="text-gray-600 text-lg mb-2">今日验证</h3>
-              <div className="text-4xl font-bold text-gray-900">{statsData.total}</div>
             </div>
-            
-            {/* 验证通过卡片 */}
-            <div className="w-[360px] h-[160px] bg-white rounded-lg p-6 shadow-md flex flex-col items-center justify-center">
-              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 mb-3">
+          </div>
+          
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-gray-500 font-medium">验证通过</p>
+                <h3 className="text-4xl font-bold text-green-600 mt-2">{statsData.passed}</h3>
+                <p className="text-xs text-gray-400 mt-1">通过率 {statsData.passRate}%</p>
+              </div>
+              <div className="p-3 bg-green-50 text-green-600 rounded-xl">
                 <Check size={24} />
               </div>
-              <h3 className="text-gray-600 text-lg mb-2">验证通过</h3>
-              <div className="text-4xl font-bold text-gray-900">{statsData.passed}</div>
-              <p className="text-gray-600 mt-1">({statsData.passRate}%)</p>
             </div>
-            
-            {/* 验证失败卡片 */}
-            <div className="w-[360px] h-[160px] bg-white rounded-lg p-6 shadow-md flex flex-col items-center justify-center">
-              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 mb-3">
+          </div>
+
+          <div className="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-gray-500 font-medium">验证失败/篡改</p>
+                <h3 className="text-4xl font-bold text-red-600 mt-2">{statsData.failed}</h3>
+                <p className="text-xs text-gray-400 mt-1">风险率 {statsData.failRate}%</p>
+              </div>
+              <div className="p-3 bg-red-50 text-red-600 rounded-xl">
                 <X size={24} />
               </div>
-              <h3 className="text-gray-600 text-lg mb-2">验证失败</h3>
-              <div className="text-4xl font-bold text-gray-900">{statsData.failed}</div>
-              <p className="text-gray-600 mt-1">({statsData.failRate}%)</p>
             </div>
           </div>
         </div>
-        
-        {/* 快速验证 */}
-        <div className="mb-10">
-          <h2 className="text-[18px] font-bold text-gray-900 mb-4">快速验证</h2>
-          <div className="bg-white rounded-lg p-6 shadow-md">
-            <h3 className="text-lg font-medium text-gray-900 mb-6">选择验证方式:</h3>
-            <div className="flex flex-wrap gap-6">
-               {/* 上传文件验证 */}
-              <div 
-                className="w-[280px] h-[200px] bg-white border border-gray-200 rounded-lg p-6 shadow-sm cursor-pointer hover:shadow-lg transition-all hover:scale-105 flex flex-col items-center justify-center"
-                onClick={() => navigate('/verify/files')}
-              >
-                <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-4">
-                  <FileCheck size={32} />
-                </div>
-                <h4 className="font-medium text-gray-900 mb-2">上传文件验证</h4>
-                <p className="text-sm text-gray-600 text-center">支持批量上传</p>
-              </div>
-              
-              {/* 证书编号验证 */}
-              <div 
-                className="w-[280px] h-[200px] bg-white border border-gray-200 rounded-lg p-6 shadow-sm cursor-pointer hover:shadow-lg transition-all hover:scale-105 flex flex-col items-center justify-center"
-                onClick={() => navigate('/verify/certificate')}
-              >
-                <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 mb-4">
-                  <span className="text-2xl font-bold">🔢</span>
-                </div>
-                <h4 className="font-medium text-gray-900 mb-2">证书编号验证</h4>
-                <p className="text-sm text-gray-600 text-center">输入或扫描编号</p>
-              </div>
+
+        {/* 快速验证入口 */}
+        <div className="grid grid-cols-2 gap-6 mb-10">
+          <div 
+            onClick={() => navigate('/verify/files')}
+            className="h-[160px] bg-white border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all group"
+          >
+            <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <FileCheck size={28} />
             </div>
+            <h3 className="font-bold text-gray-700 text-lg">上传文件验真</h3>
+            <p className="text-sm text-gray-400 mt-1">支持拖拽 PDF / 影像文件</p>
+          </div>
+
+          <div 
+            onClick={() => navigate('/verify/certificate')}
+            className="h-[160px] bg-white border-2 border-dashed border-gray-300 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition-all group"
+          >
+            <div className="w-14 h-14 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <ShieldCheck size={28} />
+            </div>
+            <h3 className="font-bold text-gray-700 text-lg">数字证书编号查询</h3>
+            <p className="text-sm text-gray-400 mt-1">输入 Hash 或 证书 ID</p>
           </div>
         </div>
-        
-        {/* 最近验证记录 */}
-        <div>
-          <h2 className="text-[18px] font-bold text-gray-900 mb-4">最近验证记录</h2>
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      时间
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      文件名
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      结果
-                    </th>
-                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      操作
-                    </th>
+
+        {/* 最新验证记录 */}
+        <section>
+          <h2 className="text-xl font-bold text-gray-800 mb-6">实时验证日志</h2>
+          <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">时间戳</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">文件名</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">文件指纹 (Hash)</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">验证结果</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {verificationRecords.map((record) => (
+                  <tr key={record.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-6 py-4 text-sm text-gray-600 font-mono">{record.time}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-800">{record.fileName}</td>
+                    <td className="px-6 py-4 text-xs text-gray-400 font-mono">{record.hash}</td>
+                    <td className="px-6 py-4">
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                        record.result === 'pass' 
+                          ? 'bg-green-100 text-green-700' 
+                          : 'bg-red-100 text-red-700'
+                      }`}>
+                        {record.result === 'pass' ? '通过' : '篡改警报'}
+                      </span>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {verificationRecords.map((record, index) => (
-                    <tr 
-                      key={record.id} 
-                      className={`h-[48px] ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}
-                    >
-                      <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
-                        {record.time}
-                      </td>
-                      <td className="px-6 py-2 whitespace-nowrap text-sm text-gray-900">
-                        {record.fileName}
-                      </td>
-                      <td className="px-6 py-2 whitespace-nowrap">
-                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          record.result === 'pass' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {record.result === 'pass' ? '✓ 通过' : '✗ 失败'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-2 whitespace-nowrap text-sm font-medium">
-                        <button 
-                          className="text-blue-600 hover:text-blue-900 transition-colors"
-                          onClick={() => handleViewDetails(record.id)}
-                        >
-                          详情
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
+        </section>
       </main>
     </div>
   );

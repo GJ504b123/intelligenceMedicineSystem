@@ -11,4 +11,10 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* 优化背景质感 */
+body {
+  background-color: #f8fafc !important; /* slate-50 */
+  background-image: radial-gradient(#e2e8f0 0.5px, transparent 0.5px);
+  background-size: 24px 24px; /* 微弱的点阵背景，增加工业严谨感 */
+}
 }

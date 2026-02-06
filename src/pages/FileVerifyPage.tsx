@@ -1,32 +1,34 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { FileCheck, X, Bell, Trash2, Upload, FileText, Image, CheckCircle, Clock } from 'lucide-react';
+import { 
+  FileCheck, X, Bell, Trash2, Upload, FileText, 
+  Image, CheckCircle, Clock, ShieldCheck, Database, 
+  LayoutDashboard, BarChart2, RefreshCw, Loader2, 
+  ScanLine, FileCode, Lock, Terminal, Check
+} from 'lucide-react';
 import { useContext } from 'react';
 import { AuthContext } from '@/contexts/authContext';
 
-// 类型定义
+// 模拟验证日志步骤
+const VERIFY_LOGS = [
+  { step: 1, text: '正在初始化安全沙箱环境...', delay: 800 },
+  { step: 2, text: '正在读取文件二进制数据流...', delay: 1500 },
+  { step: 3, text: '计算文件 SHA-256 数字指纹...', delay: 2500 },
+  { step: 4, text: '正在连接区块链存证节点 (Node: BJ-Core-04)...', delay: 3500 },
+  { step: 5, text: '检索区块高度 #829,102 上的存证记录...', delay: 4500 },
+  { step: 6, text: '比对数字签名与 CA 证书有效性...', delay: 5500 },
+  { step: 7, text: '验证完成：文件指纹匹配，未发现篡改痕迹。', delay: 6500 },
+];
+
 interface FileItem {
   id: string;
   name: string;
   size: number;
   type: string;
   status: 'waiting' | 'verifying' | 'completed' | 'failed';
-  progress: number;
-  message?: string;
-  verified?: boolean;
+  hash?: string;
 }
-
-// 文件图标映射
-const getFileIcon = (fileName: string) => {
-  const extension = fileName.split('.').pop()?.toLowerCase();
-  if (['jpg', 'jpeg', 'png'].includes(extension || '')) {
-    return <Image size={18} className="text-blue-500" />;
-  } else if (['pdf'].includes(extension || '')) {
-    return <FileText size={18} className="text-red-500" />;
-  }
-  return <FileCheck size={18} className="text-gray-500" />;
-};
 
 // 格式化文件大小
 const formatFileSize = (bytes: number): string => {
@@ -41,424 +43,295 @@ export default function FileVerifyPage() {
   const navigate = useNavigate();
   const { logout } = useContext(AuthContext);
   const [currentDate, setCurrentDate] = useState('');
+  
+  // 文件相关状态
+  const [files, setFiles] = useState<FileItem[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [files, setFiles] = useState<FileItem[]>([
-    {
-      id: '1',
-      name: '病历报告.pdf',
-      size: 2.3 * 1024 * 1024, // 2.3MB
-      type: 'application/pdf',
-      status: 'verifying',
-      progress: 60,
-      message: '正在计算文件哈希值...'
-    },
-    {
-      id: '2',
-      name: '口腔影像.jpg',
-      size: 1.8 * 1024 * 1024, // 1.8MB
-      type: 'image/jpeg',
-      status: 'waiting',
-      progress: 0
-    }
-  ]);
-  
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const dropAreaRef = useRef<HTMLDivElement>(null);
   
-  // 获取当前日期并格式化
+  // 验证过程状态
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [currentLogIndex, setCurrentLogIndex] = useState(-1);
+  const [activeFileId, setActiveFileId] = useState<string | null>(null);
+  
   useEffect(() => {
     const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-    const weekday = weekdays[date.getDay()];
-    
-    setCurrentDate(`${year}年${month}月${day}日 星期${weekday}`);
+    setCurrentDate(`${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`);
   }, []);
-  
-  // 模拟验证进度
-  useEffect(() => {
-    const verifyingFile = files.find(file => file.status === 'verifying');
-    if (!verifyingFile) return;
-    
-    const timer = setInterval(() => {
-      setFiles(prevFiles => 
-        prevFiles.map(file => {
-          if (file.id === verifyingFile.id && file.progress < 100) {
-            const newProgress = file.progress + 5;
-            return {
-              ...file,
-              progress: newProgress,
-               status: newProgress === 100 ? 'completed' : 'verifying',
-               message: newProgress === 100 ? '验证完成' : '正在计算文件哈希值...',
-               verified: newProgress === 100
-            };
-          }
-          return file;
-        })
-      );
-    }, 1000);
-    
-    return () => clearInterval(timer);
-  }, [files]);
-  
-  // 处理导航点击
-  const handleNavClick = (path: string) => {
-    navigate(path);
-    toast(`导航到${path === '/verify' ? '验证中心' : path.substring(7)}`);
-  };
-  
-  // 处理通知点击
-  const handleNotificationClick = () => {
-    toast('您有新的通知');
-  };
-  
-  // 处理拖拽事件
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(true);
-  };
-  
-  const handleDragLeave = () => {
-    setIsDragOver(false);
-  };
-  
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragOver(false);
-    
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const newFiles: FileItem[] = [];
-      const validExtensions = ['pdf', 'docx', 'jpg', 'jpeg', 'png', 'dicom'];
-      
-      for (let i = 0; i < e.dataTransfer.files.length; i++) {
-        const file = e.dataTransfer.files[i];
-        const extension = file.name.split('.').pop()?.toLowerCase();
-        
-        // 检查文件格式是否支持
-        if (extension && validExtensions.includes(extension)) {
-          newFiles.push({
-            id: Date.now() + i.toString(),
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            status: 'waiting',
-            progress: 0
-          });
-        } else {
-          toast(`不支持的文件格式: ${file.name}`);
-        }
-      }
-      
-      // 检查文件数量限制
-      if (files.length + newFiles.length > 20) {
-        toast('最多支持20个文件同时验证');
-        const remainingSlots = 20 - files.length;
-        if (remainingSlots > 0) {
-          setFiles([...files, ...newFiles.slice(0, remainingSlots)]);
-        }
-      } else {
-        setFiles([...files, ...newFiles]);
-      }
-    }
-  };
-  
+
   // 处理文件选择
-  const handleFileSelect = () => {
-    fileInputRef.current?.click();
-  };
-  
-  const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const newFiles: FileItem[] = [];
-      const validExtensions = ['pdf', 'docx', 'jpg', 'jpeg', 'png', 'dicom'];
-      
-      for (let i = 0; i < e.target.files.length; i++) {
-        const file = e.target.files[i];
-        const extension = file.name.split('.').pop()?.toLowerCase();
-        
-        // 检查文件格式是否支持
-        if (extension && validExtensions.includes(extension)) {
-          newFiles.push({
-            id: Date.now() + i.toString(),
-            name: file.name,
-            size: file.size,
-            type: file.type,
-            status: 'waiting',
-            progress: 0
-          });
-        } else {
-          toast(`不支持的文件格式: ${file.name}`);
-        }
-      }
-      
-      // 检查文件数量限制
-      if (files.length + newFiles.length > 20) {
-        toast('最多支持20个文件同时验证');
-        const remainingSlots = 20 - files.length;
-        if (remainingSlots > 0) {
-          setFiles([...files, ...newFiles.slice(0, remainingSlots)]);
-        }
-      } else {
-        setFiles([...files, ...newFiles]);
-      }
-    }
-  };
-  
-  // 删除文件
-  const handleDeleteFile = (fileId: string) => {
-    setFiles(prevFiles => prevFiles.filter(file => file.id !== fileId));
-    toast('文件已从待验证列表中移除');
-  };
-  
-  // 清空列表
-  const handleClearList = () => {
-    if (files.some(file => file.status === 'verifying')) {
-      toast('有文件正在验证中，无法清空列表');
-      return;
-    }
-    setFiles([]);
-    toast('待验证列表已清空');
-  };
-  
-  // 开始验证
-  const handleStartVerification = () => {
-    const waitingFiles = files.filter(file => file.status === 'waiting');
-    if (waitingFiles.length === 0) {
-      toast('没有等待验证的文件');
-      return;
-    }
+  const handleFilesSelected = (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent) => {
+    let selectedFiles: FileList | null = null;
     
-    // 开始第一个等待验证的文件
-    setFiles(prevFiles => 
-      prevFiles.map((file, index) => {
-        if (file.status === 'waiting' && index === prevFiles.findIndex(f => f.status === 'waiting')) {
-          return { ...file, status: 'verifying', progress: 10, message: '正在计算文件哈希值...' };
-        }
-        return file;
-      })
-    );
-    
-    toast('开始验证文件');
-  };
-  
-  // 获取状态显示文本
-  const getStatusText = (status: FileItem['status']) => {
-    switch (status) {
-      case 'waiting':
-        return '⏸ 等待验证';
-      case 'verifying':
-        return '🔄 验证中...';
-       case 'completed':
-         // 模拟验证结果，50%概率验证成功，50%概率验证失败
-         const isVerified = Math.random() > 0.5;
-         // 实际应用中，这里应该根据真实的验证结果来决定跳转到哪个页面
-         setTimeout(() => {
-           if (isVerified) {
-             // 验证成功，这里应该跳转到验证成功页面
-             // 由于用户只提供了验证失败页面，这里暂时也跳转到验证失败页面
-             navigate('/verify/result');
-           } else {
-             // 验证失败，跳转到验证失败页面
-             navigate('/verify/result');
-           }
-         }, 1000);
-         return '✅ 验证完成';
-      case 'failed':
-        return '❌ 验证失败';
-      default:
-        return '';
+    if ('dataTransfer' in e) {
+      e.preventDefault();
+      setIsDragOver(false);
+      selectedFiles = e.dataTransfer.files;
+    } else {
+      selectedFiles = (e.target as HTMLInputElement).files;
+    }
+
+    if (selectedFiles && selectedFiles.length > 0) {
+      const newFiles: FileItem[] = Array.from(selectedFiles).map((file, index) => ({
+        id: Date.now() + index.toString(),
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        status: 'waiting'
+      }));
+      setFiles(prev => [...prev, ...newFiles]);
+      toast.success(`已添加 ${newFiles.length} 个文件等待验证`);
     }
   };
 
+  // 开始模拟验证过程
+  const startVerification = (fileId: string) => {
+    if (isVerifying) return;
+    
+    setActiveFileId(fileId);
+    setIsVerifying(true);
+    setCurrentLogIndex(0);
+    
+    // 将当前文件状态设为 verifying
+    setFiles(prev => prev.map(f => f.id === fileId ? { ...f, status: 'verifying' } : f));
+
+    // 启动日志序列
+    let step = 0;
+    const interval = setInterval(() => {
+      if (step < VERIFY_LOGS.length) {
+        setCurrentLogIndex(step);
+        step++;
+      } else {
+        clearInterval(interval);
+        finishVerification(fileId);
+      }
+    }, 800); // 每 0.8 秒显示一行日志
+  };
+
+  const finishVerification = (fileId: string) => {
+    setIsVerifying(false);
+    setFiles(prev => prev.map(f => f.id === fileId ? { 
+      ...f, 
+      status: 'completed',
+      hash: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' // 模拟的 Hash
+    } : f));
+    toast.success('文件验证通过！');
+  };
+
+  const clearList = () => {
+    setFiles([]);
+    setCurrentLogIndex(-1);
+    setIsVerifying(false);
+  };
+
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
-      {/* 顶部导航栏 */}
-      <header className="h-[64px] bg-[#1E293B] fixed top-0 left-0 right-0 z-10 shadow-md">
-        <div className="max-w-[1440px] mx-auto h-full px-4 flex items-center justify-between">
-          {/* 左侧 Logo */}
-          <div className="text-2xl font-bold text-white">验证服务中心</div>
-          
-          {/* 中间导航菜单 */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <button
-              onClick={() => handleNavClick('/verify')}
-              className="text-white/70 hover:text-white transition-colors"
+    <div className="flex min-h-screen bg-[#F8FAFC]">
+      {/* 侧边导航栏 - 第三方深色主题 */}
+      <aside className="w-[240px] bg-[#1E293B] text-white flex flex-col fixed h-full shadow-xl z-20">
+        <div className="p-6 flex items-center gap-3">
+          <div className="bg-white p-1 rounded-lg">
+            <img src="/src/picture/nav.png" className="w-8 h-8" alt="Logo" />
+          </div>
+          <span className="text-xl font-bold tracking-tight">公信验证中心</span>
+        </div>
+        
+        <nav className="flex-1 px-4 mt-4 space-y-2">
+          {[
+            { name: '验证概览', icon: LayoutDashboard, path: '/verify' },
+            { name: '文件校验', icon: FileCheck, path: '/verify/files', active: true },
+            { name: '证书查询', icon: ShieldCheck, path: '/verify/certificate' },
+            { name: '存证记录', icon: Database, path: '/verify/records' },
+            { name: '统计报表', icon: BarChart2, path: '/verify/statistics' },
+          ].map((item) => (
+            <div 
+              key={item.name} 
+              onClick={() => navigate(item.path)}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all ${
+                item.active ? 'bg-white/10 shadow-inner' : 'hover:bg-white/5'
+              }`}
             >
-              验证中心
+              <item.icon size={20} className={item.active ? 'text-white' : 'text-white/60'} />
+              <span className={item.active ? 'font-bold' : 'text-white/80'}>{item.name}</span>
+            </div>
+          ))}
+        </nav>
+        
+        <div className="p-6 border-t border-white/10">
+          <button onClick={logout} className="flex items-center gap-2 text-white/60 hover:text-red-300 transition-colors">
+            <RefreshCw size={18} /> 退出系统
+          </button>
+        </div>
+      </aside>
+
+      {/* 主体内容 */}
+      <main className="flex-1 ml-[240px] p-10">
+        <header className="flex justify-between items-center mb-10">
+          <div>
+            <h1 className="text-3xl font-bold text-[#1E293B]">文件验真</h1>
+            <p className="text-gray-500 mt-2 flex items-center gap-2">
+              <Clock size={16} /> 验证节点状态：<span className="text-green-600 font-bold">在线</span> · {currentDate}
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <button className="relative p-2 bg-white border border-gray-200 rounded-full hover:bg-gray-50">
+              <Bell size={20} className="text-gray-600" />
             </button>
-            <button
-              onClick={() => handleNavClick('/verify/records')}
-              className="text-white/70 hover:text-white transition-colors"
-            >
-              验证记录
-            </button>
-            <button
-              onClick={() => handleNavClick('/verify/statistics')}
-              className="text-white/70 hover:text-white transition-colors"
-            >
-              统计分析
-            </button>
-            <button
-              onClick={() => handleNavClick('/verify/organization')}
-              className="text-white/70 hover:text-white transition-colors"
-            >
-              机构管理
-            </button>
-          </nav>
-          
-          {/* 右侧操作区 */}
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={logout}
-              className="px-3 py-1.5 border border-white/30 text-white rounded hover:bg-white/10 transition-colors text-sm hidden md:block"
-            >
-              退出登录
-            </button>
-            
-            <button 
-              onClick={handleNotificationClick} 
-              className="relative p-2 rounded-full hover:bg-white/20 transition-colors"
-              aria-label="通知"
-            >
-              <Bell className="text-white" size={20} />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-            
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white font-medium">
-              验
+            <div className="px-4 py-2 bg-gray-100 rounded-full text-gray-600 font-medium text-sm">
+              管理员：Admin_01
             </div>
           </div>
-        </div>
-      </header>
-      
-      {/* 主内容区域 */}
-      <main className="flex-grow pt-[64px] px-[40px] py-[32px] max-w-[1440px] mx-auto w-full">
-        {/* 文件验证标题 */}
-        <div className="mb-8">
-          <h1 className="text-[28px] font-bold text-gray-900">文件验证</h1>
-          <p className="text-gray-600 mt-2">今天是 {currentDate}</p>
-        </div>
-        
-        {/* 拖拽上传区域 */}
-        <div 
-          ref={dropAreaRef}
-          className={`
-            mb-8 border-2 border-dashed rounded-[12px] p-8 flex flex-col items-center justify-center
-            transition-all h-[300px] cursor-pointer
-            ${isDragOver 
-              ? 'border-green-500 bg-green-50' 
-              : 'border-[#94A3B8] bg-white'
-            }
-          `}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          onClick={handleFileSelect}
-        >
-          <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-4">
-            <Upload size={32} />
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* 左侧：上传与列表区 */}
+          <div className="space-y-6">
+            {/* 拖拽上传区 */}
+            <div 
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+              onDragLeave={() => setIsDragOver(false)}
+              onDrop={handleFilesSelected}
+              className={`
+                h-[200px] border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all
+                ${isDragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white hover:border-blue-400 hover:bg-gray-50'}
+              `}
+            >
+              <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4">
+                <Upload size={32} />
+              </div>
+              <p className="text-gray-700 font-bold text-lg">点击或拖拽文件到此处</p>
+              <p className="text-gray-400 text-sm mt-1">支持 PDF, JPG, PNG, DICOM (最大 50MB)</p>
+              <input ref={fileInputRef} type="file" className="hidden" onChange={handleFilesSelected} />
+            </div>
+
+            {/* 待验证列表 */}
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden min-h-[300px]">
+              <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 className="font-bold text-gray-700 flex items-center gap-2">
+                  <FileText size={18} /> 验证队列 ({files.length})
+                </h3>
+                {files.length > 0 && (
+                  <button onClick={clearList} className="text-xs text-red-500 hover:underline">清空列表</button>
+                )}
+              </div>
+              
+              <div className="p-4 space-y-3">
+                {files.length === 0 ? (
+                  <div className="flex flex-col items-center justify-center h-[200px] text-gray-400">
+                    <FileCode size={48} className="mb-2 opacity-20" />
+                    <p>暂无文件</p>
+                  </div>
+                ) : (
+                  files.map(file => (
+                    <div key={file.id} className={`p-4 rounded-xl border transition-all ${
+                      file.status === 'verifying' ? 'border-blue-500 bg-blue-50 ring-2 ring-blue-100' : 'border-gray-100 bg-white hover:border-gray-300'
+                    }`}>
+                      <div className="flex justify-between items-center mb-2">
+                        <div className="flex items-center gap-3">
+                          {file.status === 'completed' ? (
+                            <CheckCircle className="text-green-500" size={20} />
+                          ) : (
+                            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-gray-500">
+                              {file.name.endsWith('.pdf') ? <FileText size={20} /> : <Image size={20} />}
+                            </div>
+                          )}
+                          <div>
+                            <p className="font-bold text-gray-800 text-sm">{file.name}</p>
+                            <p className="text-xs text-gray-400">{formatFileSize(file.size)}</p>
+                          </div>
+                        </div>
+                        {file.status === 'waiting' && (
+                          <button 
+                            onClick={() => startVerification(file.id)}
+                            disabled={isVerifying}
+                            className="px-4 py-1.5 bg-[#1E293B] text-white text-xs rounded-full hover:bg-black disabled:opacity-50 transition-colors"
+                          >
+                            开始验证
+                          </button>
+                        )}
+                        {file.status === 'verifying' && <Loader2 className="animate-spin text-blue-600" size={20} />}
+                        {file.status === 'completed' && <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded">通过</span>}
+                      </div>
+                      
+                      {/* 如果已完成，显示 Hash */}
+                      {file.status === 'completed' && (
+                        <div className="mt-2 text-[10px] font-mono text-gray-400 bg-gray-50 p-2 rounded truncate">
+                          Hash: {file.hash}
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
-          <h2 className="text-xl font-medium text-gray-900 mb-2">拖拽文件到此处验证</h2>
-          <p className="text-gray-600 mb-4">或点击选择文件</p>
-          <p className="text-sm text-gray-500">支持格式: PDF, DOCX, JPG, PNG, DICOM</p>
-          <p className="text-sm text-gray-500">支持批量验证，最多20个文件</p>
-          
-          {/* 隐藏的文件输入框 */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            multiple
-            accept=".pdf,.docx,.jpg,.jpeg,.png,.dicom"
-            className="hidden"
-            onChange={handleFilesSelected}
-          />
-        </div>
-        
-        {/* 待验证文件列表 */}
-        {files.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">待验证文件 ({files.length})</h2>
-            
-            <div className="space-y-4">
-              {files.map((file) => (
-                <div key={file.id} className="bg-white rounded-lg shadow-sm p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex items-center">
-                      <div className="mr-3">
-                        {getFileIcon(file.name)}
-                      </div>
-                      <div>
-                        <div className="text-gray-900 font-medium">{file.name}</div>
-                        <div className="text-sm text-gray-500">{formatFileSize(file.size)}</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center">
-                      <span className={`
-                        text-sm font-medium mr-4
-                        ${file.status === 'waiting' ? 'text-yellow-600' : ''}
-                        ${file.status === 'verifying' ? 'text-blue-600' : ''}
-                        ${file.status === 'completed' ? 'text-green-600' : ''}
-                        ${file.status === 'failed' ? 'text-red-600' : ''}
-                      `}>
-                        {getStatusText(file.status)}
-                      </span>
-                      <button
-                        onClick={() => handleDeleteFile(file.id)}
-                        className="text-gray-400 hover:text-red-500 transition-colors"
-                        disabled={file.status === 'verifying'}
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
+
+          {/* 右侧：验证控制台 (录屏核心) */}
+          <div className="bg-[#0F172A] rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[600px] border border-gray-700">
+            {/* 终端头部 */}
+            <div className="bg-[#1E293B] p-4 flex items-center justify-between border-b border-gray-700">
+              <div className="flex items-center gap-2">
+                <Terminal size={18} className="text-green-400" />
+                <span className="text-sm font-mono text-gray-300">Verification_Console.exe</span>
+              </div>
+              <div className="flex gap-2">
+                <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                <div className="w-3 h-3 rounded-full bg-green-500"></div>
+              </div>
+            </div>
+
+            {/* 终端内容区 */}
+            <div className="flex-1 p-6 font-mono text-sm overflow-y-auto space-y-4">
+              {!isVerifying && !activeFileId ? (
+                <div className="h-full flex flex-col items-center justify-center text-gray-600">
+                  <ShieldCheck size={64} className="mb-4 opacity-20" />
+                  <p>等待启动验证任务...</p>
+                  <p className="text-xs mt-2">系统已连接至公信链节点</p>
+                </div>
+              ) : (
+                <>
+                  <div className="text-gray-400 pb-2 border-b border-gray-800 mb-4">
+                    Target: <span className="text-blue-400">{files.find(f => f.id === activeFileId)?.name}</span>
                   </div>
                   
-                  {file.status === 'verifying' && (
-                    <div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                        <div 
-                          className="bg-green-500 h-2 rounded-full" 
-                          style={{ width: `${file.progress}%` }}
-                        ></div>
-                      </div>
-                      <div className="text-sm text-gray-600 flex items-center">
-                        <Clock size={14} className="mr-1" />
-                        {file.message}
-                      </div>
+                  {VERIFY_LOGS.map((log, index) => (
+                    <div 
+                      key={index} 
+                      className={`flex items-start gap-3 transition-all duration-300 ${
+                        index <= currentLogIndex ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4 hidden'
+                      }`}
+                    >
+                      <span className="text-gray-500">[{new Date().toLocaleTimeString()}]</span>
+                      {index < VERIFY_LOGS.length - 1 ? (
+                        <>
+                          <span className="text-blue-500">➜</span>
+                          <span className="text-gray-300">{log.text}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="text-green-500">✔</span>
+                          <span className="text-green-400 font-bold">{log.text}</span>
+                        </>
+                      )}
                     </div>
+                  ))}
+
+                  {/* 正在进行时的光标动画 */}
+                  {isVerifying && (
+                    <div className="animate-pulse text-green-500 mt-2">_</div>
                   )}
-                </div>
-              ))}
+                </>
+              )}
             </div>
             
-            {/* 操作按钮 */}
-            <div className="flex justify-end mt-6">
-              <button
-                onClick={handleClearList}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors mr-3"
-              >
-                清空列表
-              </button>
-              <button
-                onClick={handleStartVerification}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-              >
-                开始验证
-              </button>
+            {/* 底部状态栏 */}
+            <div className="bg-[#1E293B] p-2 px-4 text-xs text-gray-500 flex justify-between border-t border-gray-700">
+              <span>Status: {isVerifying ? 'PROCESSING' : 'IDLE'}</span>
+              <span>Mem: 42% | CPU: 12%</span>
             </div>
           </div>
-        )}
-        
-        {/* 空状态提示 */}
-        {files.length === 0 && (
-          <div className="flex justify-center items-center h-[300px] bg-white rounded-lg border border-dashed border-gray-200">
-            <div className="text-center">
-              <Upload size={48} className="text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">暂无待验证文件，请上传需要验证的文件</p>
-            </div>
-          </div>
-        )}
+        </div>
       </main>
     </div>
   );
