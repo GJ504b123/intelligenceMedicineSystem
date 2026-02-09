@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { FileCheck, Bell, Search } from 'lucide-react';
@@ -37,31 +37,11 @@ const recentVerificationRecords: VerificationRecord[] = [
 
 export default function CertificateVerifyPage() {
   const navigate = useNavigate();
-  const { logout } = useContext(AuthContext);
   const [currentDate, setCurrentDate] = useState('');
   const [certificateNumber, setCertificateNumber] = useState('CERT-2025011514321800123456');
-44|   // 获取当前日期并格式化
-  useEffect(() => {
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
-    const weekday = weekdays[date.getDay()];
-    
-    setCurrentDate(`${year}年${month}月${day}日 星期${weekday}`);
-  }, []);
-  
-  // 处理导航点击
-  const handleNavClick = (path: string) => {
-    navigate(path);
-    toast(`导航到${path === '/verify' ? '验证中心' : path.substring(7)}`);
-  };
-  
-  // 处理通知点击
-  const handleNotificationClick = () => {
-    toast('您有新的通知');
-  };
+  // 获取当前日期并格式化
+
+
 
   // 处理证书编号输入变化
   const handleCertificateNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,66 +85,10 @@ export default function CertificateVerifyPage() {
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
       {/* 顶部导航栏 */}
-      <header className="h-[64px] bg-[#1E293B] fixed top-0 left-0 right-0 z-10 shadow-md">
-        <div className="max-w-[1440px] mx-auto h-full px-4 flex items-center justify-between">
-          {/* 左侧 Logo */}
-          <div className="text-2xl font-bold text-white">验证服务中心</div>
-          
-          {/* 中间导航菜单 */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <button
-              onClick={() => handleNavClick('/verify')}
-              className="text-white/70 hover:text-white transition-colors"
-            >
-              验证中心
-            </button>
-            <button
-              onClick={() => handleNavClick('/verify/records')}
-              className="text-white/70 hover:text-white transition-colors"
-            >
-              验证记录
-            </button>
-            <button
-              onClick={() => handleNavClick('/verify/statistics')}
-              className="text-white/70 hover:text-white transition-colors"
-            >
-              统计分析
-            </button>
-            <button
-              onClick={() => handleNavClick('/verify/organization')}
-              className="text-white/70 hover:text-white transition-colors"
-            >
-              机构管理
-            </button>
-          </nav>
-          
-          {/* 右侧操作区 */}
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={logout}
-              className="px-3 py-1.5 border border-white/30 text-white rounded hover:bg-white/10 transition-colors text-sm hidden md:block"
-            >
-              退出登录
-            </button>
-            
-            <button 
-              onClick={handleNotificationClick} 
-              className="relative p-2 rounded-full hover:bg-white/20 transition-colors"
-              aria-label="通知"
-            >
-              <Bell className="text-white" size={20} />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-            
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center text-white font-medium">
-              验
-            </div>
-          </div>
-        </div>
-      </header>
+
       
       {/* 主内容区域 */}
-      <main className="flex-grow pt-[64px] px-[40px] py-[32px] max-w-[1440px] mx-auto w-full">
+      <main className="flex-grow pt-[24px] px-[40px] py-[32px] max-w-[1440px] mx-auto w-full">
         {/* 证书编号验证标题 */}
         <div className="mb-8">
           <h1 className="text-[28px] font-bold text-gray-900">证书编号验证</h1>

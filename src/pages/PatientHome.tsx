@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { 
@@ -33,77 +32,16 @@ const notificationItems = [
 
 export default function PatientHome() {
   const navigate = useNavigate();
-  const { theme, toggleTheme } = useTheme();
-  const { logout } = useContext(AuthContext);
-  const [greeting, setGreeting] = useState('');
-  const [currentDate, setCurrentDate] = useState('');
-  
-  useEffect(() => {
-    const hour = new Date().getHours();
-    setGreeting(hour < 12 ? '早上好' : hour < 18 ? '下午好' : '晚上好');
-    
-    const date = new Date();
-    setCurrentDate(`${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`);
-  }, []);
+
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC]">
       {/* 侧边导航栏 - 患者端绿色主题 */}
-      <aside className="w-[240px] bg-[#059669] text-white flex flex-col fixed h-full shadow-xl z-20">
-        <div className="p-6 flex items-center gap-3">
-          <div className="bg-white p-1 rounded-lg">
-            <img src="/src/picture/nav.png" className="w-18 h-8" alt="Logo" />
-          </div>
-          <span className="text-xl font-bold tracking-tight">医点就通</span>
-        </div>
-        
-        <nav className="flex-1 px-4 mt-4 space-y-2">
-          {[
-            { name: '健康概览', icon: LayoutDashboard, path: '/patient', active: true },
-            { name: '我的病历', icon: FileText, path: '/patient/records' },
-            { name: 'AI 智能自查', icon: Brain, path: '/patient/ai-chat' },
-            { name: '授权管理', icon: Shield, path: '#' },
-            { name: '个人中心', icon: User, path: '/patient/profile' },
-          ].map((item) => (
-            <div 
-              key={item.name} 
-              onClick={() => item.path !== '#' && navigate(item.path)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all ${
-                item.active ? 'bg-white/10 shadow-inner' : 'hover:bg-white/5'
-              }`}
-            >
-              <item.icon size={20} className={item.active ? 'text-white' : 'text-white/80'} />
-              <span className={item.active ? 'font-bold' : 'text-white/90'}>{item.name}</span>
-            </div>
-          ))}
-        </nav>
-        
-        <div className="p-6 border-t border-white/10">
-          <button onClick={logout} className="flex items-center gap-2 text-white/80 hover:text-white transition-colors">
-            <RefreshCw size={18} /> 退出登录
-          </button>
-        </div>
-      </aside>
+
 
       {/* 主体内容 */}
-      <main className="flex-1 ml-[240px] p-10">
-        <header className="flex justify-between items-center mb-10">
-          <div>
-            <h1 className="text-3xl font-bold text-[#1E293B]">{greeting}，李明</h1>
-            <p className="text-gray-500 mt-2 flex items-center gap-2">
-              <Clock size={16} /> 您的健康档案状态：<span className="text-green-600 font-bold">优秀</span> · {currentDate}
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="relative p-2 bg-white border border-gray-200 rounded-full hover:bg-gray-50 shadow-sm">
-              <Bell size={20} className="text-gray-600" />
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
-            </button>
-            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-bold border border-green-200">
-              李
-            </div>
-          </div>
-        </header>
+      <main className="flex-1  p-10">
+
 
         {/* 欢迎卡片 */}
         <div className="bg-gradient-to-r from-[#059669] to-[#10B981] rounded-2xl p-8 text-white shadow-lg mb-10 relative overflow-hidden">

@@ -10,6 +10,8 @@ import {
 import { useContext } from 'react';
 import { AuthContext } from '@/contexts/authContext';
 
+
+
 export default function RecordCreatePage() {
   const navigate = useNavigate();
   const { logout } = useContext(AuthContext);
@@ -99,45 +101,13 @@ export default function RecordCreatePage() {
   };
 
   return (
+
     <div className="flex min-h-screen bg-[#F8FAFC]">
       {/* 复用 Sidebar，解决割裂感 */}
-      <aside className="w-[240px] bg-[#1E40AF] text-white flex flex-col fixed h-full shadow-xl z-20">
-        <div className="p-6 flex items-center gap-3">
-          <div className="bg-white p-1 rounded-lg">
-            <img src="/src/picture/nav.png" className="w-18 h-8" alt="Logo" />
-          </div>
-          <span className="text-xl font-bold tracking-tight">医点就通</span>
-        </div>
-        <nav className="flex-1 px-4 mt-4 space-y-2">
-          {/* 这里为了视觉统一，保持与 Home 页一致的菜单 */}
-          {[
-            { name: '工作面板', icon: LayoutDashboard, active: true },
-            { name: '患者管理', icon: Users },
-            { name: '病历库', icon: FileText },
-            { name: '存证中心', icon: ShieldCheck },
-            { name: '数据分析', icon: TrendingUp },
-          ].map((item) => (
-            <div 
-              key={item.name} 
-              onClick={() => item.name === '工作面板' && navigate('/')}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all ${
-                item.active ? 'bg-white/10 shadow-inner' : 'hover:bg-white/5'
-              }`}
-            >
-              <item.icon size={20} className={item.active ? 'text-white' : 'text-white/60'} />
-              <span className={item.active ? 'font-bold' : 'text-white/80'}>{item.name}</span>
-            </div>
-          ))}
-        </nav>
-        <div className="p-6 border-t border-white/10">
-          <button onClick={logout} className="flex items-center gap-2 text-white/60 hover:text-red-300 transition-colors">
-            <RefreshCw size={18} /> 退出工作台
-          </button>
-        </div>
-      </aside>
+    
 
       {/* 主体内容区域 */}
-      <main className="flex-1 ml-[240px] p-10 pb-32">
+      <main className="flex-1 p-10 pb-32">
         {/* 顶部导航与状态 */}
         <nav className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4 cursor-pointer group" onClick={() => navigate('/')}>

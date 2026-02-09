@@ -27,70 +27,16 @@ const verificationRecords = [
 export default function ThirdPartyVerifyHome() {
   const navigate = useNavigate();
   const { logout } = useContext(AuthContext);
-  const [currentDate, setCurrentDate] = useState('');
   
-  useEffect(() => {
-    const date = new Date();
-    setCurrentDate(`${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`);
-  }, []);
+
 
   return (
     <div className="flex min-h-screen bg-[#F8FAFC]">
       {/* 侧边导航栏 - 第三方深色权威主题 */}
-      <aside className="w-[240px] bg-[#1E293B] text-white flex flex-col fixed h-full shadow-xl z-20">
-        <div className="p-6 flex items-center gap-3">
-          <div className="bg-white p-1 rounded-lg">
-            <img src="/src/picture/nav.png" className="w-18 h-8" alt="Logo" />
-          </div>
-          <span className="text-xl font-bold tracking-tight">医点就通</span>
-        </div>
-        
-        <nav className="flex-1 px-4 mt-4 space-y-2">
-          {[
-            { name: '验证概览', icon: LayoutDashboard, path: '/verify', active: true },
-            { name: '文件校验', icon: FileCheck, path: '/verify/files' },
-            { name: '证书查询', icon: ShieldCheck, path: '/verify/certificate' },
-            { name: '存证记录', icon: Database, path: '/verify/records' },
-            { name: '统计报表', icon: BarChart2, path: '/verify/statistics' },
-          ].map((item) => (
-            <div 
-              key={item.name} 
-              onClick={() => navigate(item.path)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all ${
-                item.active ? 'bg-white/10 shadow-inner' : 'hover:bg-white/5'
-              }`}
-            >
-              <item.icon size={20} className={item.active ? 'text-white' : 'text-white/60'} />
-              <span className={item.active ? 'font-bold' : 'text-white/80'}>{item.name}</span>
-            </div>
-          ))}
-        </nav>
-        
-        <div className="p-6 border-t border-white/10">
-          <button onClick={logout} className="flex items-center gap-2 text-white/60 hover:text-red-300 transition-colors">
-            <RefreshCw size={18} /> 退出系统
-          </button>
-        </div>
-      </aside>
+
 
       {/* 主体内容 */}
-      <main className="flex-1 ml-[240px] p-10">
-        <header className="flex justify-between items-center mb-10">
-          <div>
-            <h1 className="text-3xl font-bold text-[#1E293B]">验证控制台</h1>
-            <p className="text-gray-500 mt-2 flex items-center gap-2">
-              <Clock size={16} /> 区块链节点同步状态：<span className="text-green-600 font-bold">正常</span> · {currentDate}
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <button className="relative p-2 bg-white border border-gray-200 rounded-full hover:bg-gray-50">
-              <Bell size={20} className="text-gray-600" />
-            </button>
-            <div className="px-4 py-2 bg-gray-100 rounded-full text-gray-600 font-medium text-sm">
-              管理员：Admin_01
-            </div>
-          </div>
-        </header>
+      <main className="flex-1  p-10">
 
         {/* 统计卡片 */}
         <div className="grid grid-cols-3 gap-6 mb-10">

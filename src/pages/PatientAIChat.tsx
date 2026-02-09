@@ -100,18 +100,7 @@ export default function PatientAIChat() {
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-50">
-      <header className="h-[64px] bg-gradient-to-r from-[#10B981] to-[#059669] fixed top-0 left-0 right-0 z-10 shadow-md">
-        <div className="max-w-[1440px] mx-auto h-full px-4 flex items-center justify-between text-white">
-          <div className="flex items-center gap-2">
-            <Brain size={24} />
-            <span className="text-2xl font-bold">智能AI诊前助手</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <button onClick={logout} className="text-sm border border-white/30 px-3 py-1.5 rounded hover:bg-white/10">退出登录</button>
-            <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center font-medium">李</div>
-          </div>
-        </div>
-      </header>
+
       
       <main className="flex-grow pt-[64px] px-[20px] md:px-[40px] py-[32px] max-w-[900px] mx-auto w-full flex flex-col">
         {/* 顶部隐私提示 */}
