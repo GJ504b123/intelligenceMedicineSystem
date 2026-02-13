@@ -20,9 +20,9 @@ const ROLE_CONFIG = {
     userLabel: '张医生',
     menu: [
       { icon: LayoutDashboard, label: '工作台', path: '/' },
-      { icon: Users, label: '患者管理', path: '/patient' },
-      { icon: FileText, label: '病历管理', path: '/records/create' },
-      { icon: ShieldCheck, label: '存证中心', path: '/verify' },
+      { icon: Users, label: '患者管理', path: '/management' },
+      { icon: FileText, label: '病历管理', path: '/records' },
+      { icon: ShieldCheck, label: '存证中心', path: '/center' },
     ]
   },
   patient: {
@@ -49,7 +49,7 @@ const ROLE_CONFIG = {
       { icon: ShieldCheck, label: '验证概览', path: '/verify' },
       { icon: FileText, label: '文件校验', path: '/verify/files' },
       { icon: HistoryIcon, label: '验证记录', path: '/verify/records' },
-      { icon: BarChart3, label: '统计分析', path: '/verify/statistics' },
+      { icon: BarChart3, label: '统计分析', path: '/verify/center' },
     ]
   }
 };

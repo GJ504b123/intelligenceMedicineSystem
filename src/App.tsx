@@ -12,6 +12,9 @@ import { useState, useEffect } from "react";
 import { AuthContext } from '@/contexts/authContext';
 import { toast } from 'sonner';
 import RuoYiLayout from "@/layouts/RuoYiLayout"; // 导入我们新写的壳
+import PatientManagement from '@/pages/PatientManagement';
+import RecordManagement from '@/pages/RecordManagement';
+import VerifyCenter from '@/pages/VerifyCenter';
 
 // 从本地存储获取认证状态
 const getAuthFromLocalStorage = () => {
@@ -82,8 +85,13 @@ export default function App() {
         <Route path="/other" element={checkRouteAccess('doctor', <RuoYiLayout><div className="text-center text-xl">Other Page - Coming Soon</div></RuoYiLayout>)} />
         <Route path="/records/create" element={checkRouteAccess('doctor', <RuoYiLayout><RecordCreatePage /></RuoYiLayout>)} />
         <Route path="/records/create/:patientId" element={checkRouteAccess('doctor', <RuoYiLayout><RecordCreatePage /></RuoYiLayout>)} />
-        
+<Route path="/records" element={<RecordManagement />} />
+<Route path="/management" element={<PatientManagement />} />
+
+<Route path="/center" element={<VerifyCenter />} />
+
         {/* 患者端路由 */}
+
         <Route path="/patient" element={checkRouteAccess('patient',<RuoYiLayout> <PatientHome /></RuoYiLayout>)} />
         <Route path="/patient/appointments" element={checkRouteAccess('patient', <div className="text-center text-xl">患者端 - 预约管理页面</div>)} />
         <Route path="/patient/appointments/:id" element={checkRouteAccess('patient', <div className="text-center text-xl">患者端 - 预约详情页面</div>)} />
@@ -103,7 +111,6 @@ export default function App() {
         <Route path="/verify/organization" element={checkRouteAccess('third-party', <div className="text-center text-xl">第三方验证机构 - 机构管理页面</div>)} />
         <Route path="/verify/certificate" element={checkRouteAccess('third-party',<RuoYiLayout> <CertificateVerifyPage /></RuoYiLayout>)} />
         <Route path="/verify/result" element={checkRouteAccess('third-party',<RuoYiLayout> <VerificationResultPage /></RuoYiLayout>)} />
-        
         {/* 默认路由 */}
         <Route path="*" element={isAuthenticated ? (
           role === 'doctor' ? <Navigate to="/" /> :
