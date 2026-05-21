@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Plus, FileText, AlertCircle, RefreshCw, Loader2, Server, Activity } from 'lucide-react';
-import RuoYiLayout from '@/layouts/RuoYiLayout';
+// import RuoYiLayout from '@/layouts/RuoYiLayout';
 import { listPatients } from '@/api/patientService';
 import { Patient } from '@/api/types';
 import { toast } from 'sonner';
@@ -33,7 +33,7 @@ export default function Home() {
   }, []);
 
   return (
-    <RuoYiLayout>
+    <>
       {/* 1. 顶部统计卡片 */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         {['今日挂号: 12', '待诊人数: 5', '已存证: 128', '异常预警: 2'].map((item, i) => (
@@ -81,7 +81,7 @@ export default function Home() {
                     // 加上 &source=task，告诉页面这是“立即接诊”
                     className="bg-blue-600 text-white px-3 py-1 rounded text-xs hover:bg-blue-700 transition-colors shadow-sm"
                   >
-                    开始诊断
+                    新建病历
                   </button>
                 </td>
               </tr>
@@ -112,7 +112,7 @@ export default function Home() {
           </div>
           <div className="flex gap-3">
             <button 
-              onClick={() => navigate('/records/create')}
+              onClick={() => navigate('/records/create?source=manual')}
               className="bg-[#1890ff] text-white px-4 py-2 rounded shadow-sm hover:bg-blue-600 transition-all flex items-center gap-2 text-sm font-bold"
             >
               <Plus size={16} /> 
@@ -204,6 +204,6 @@ export default function Home() {
           </table>
         </div>
       </div>
-    </RuoYiLayout>
+    </>
   );
 }

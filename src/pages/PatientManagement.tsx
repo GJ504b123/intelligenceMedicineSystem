@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import RuoYiLayout from '@/layouts/RuoYiLayout';
+// import RuoYiLayout from '@/layouts/RuoYiLayout';
 import { Search, Plus, User, Phone, MapPin, AlertCircle, Calendar, X, Save, Filter } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -73,9 +73,8 @@ export default function PatientManagement() {
       toast.success('建档成功！已自动发送短信通知患者');
     }, 1000);
   };
-
   return (
-    <RuoYiLayout>
+    <>
       {/* 顶部统计区 (动态计算) */}
       <div className="mb-6 flex justify-between items-center animate-in slide-in-from-top-4 duration-500">
         <div>
@@ -244,6 +243,6 @@ export default function PatientManagement() {
           </div>
         </div>
       )}
-    </RuoYiLayout>
+    </>
   );
 }

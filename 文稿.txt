@@ -1,0 +1,43 @@
+欢迎观看“医点就通”数字化医疗管理系统演示。在传统医疗体系中，数据碎片化、医患信任成本高、病历易被篡改是三大核心痛点。本系统通过区块链技术与AI智能，构建了涵盖医生、患者及第三方监管机构的全链路信任闭环。
+
+ 这是我们全新的V2数字化门户。系统采用全站统一的侧边栏架构，极大降低跨模块操作成本。针对不同业务场景，我们定制了专属视觉标识：医生端严谨的“医疗蓝”、患者端生机的“健康绿”、第三方中心权威的“专业灰”。
+技术层面，系统采用微服务架构，结合联盟链技术实现数据存证，同时集成大语言模型和医学影像AI分析引擎，形成“智能+信任”的双重保障。这种架构不仅确保了系统的高可用性和安全性，也为未来的功能扩展预留了充足空间。
+
+ 现在进入医生端工作台。首页的“诊断结果差异预警”是系统核心安控模块。通过AI后台影像学特征比对，系统会自动标记医生初步诊断与系统分析模板的逻辑差异，以高亮卡片形式展示，强制医生在下达处方前进行二次评估。
+ 进入“新建病历”环节，系统会自动触发“智能合规性稽核”。系统实时扫描：从影像文件清晰度提取，到患者身份信息脱敏比对，再到诊疗逻辑合法性检查。这种“先稽核、后存证”的流程，确保入链数据的绝对质量。
+
+ 稽核通过后，医生进行电子签名授权。点击“提交存证”，系统执行SHA-256算法提取病历指纹，向分布式账本发起共识请求。此时，病历已成为拥有时间戳、数字签名和唯一Hash值的法律存证实体。
+
+切换至患者端。针对“看病难、症状描述难”的行业痛点，系统打造了AI交互式导诊助手，全程辅助患者梳理症状、实现精准分诊。值得注意的是，导诊会话数据不上传数据库且按规定时长自动销毁，全方位保障患者隐私安全。
+
+现在我们来模拟一个真实场景。患者在输入框中输入“牙齿遇冷酸痛”，点击发送后，系统立即进入“深度思考”模式，后台调取口腔医学知识库进行分析。
+
+几秒钟后，AI助手开始发起阶梯式追问。首先，询问症状是持续性还是间歇性的；接着，利用疼痛视觉模拟量表，引导患者进行1到10分的量化评价；然后，询问是否观察到牙齿表面有黑点或楔状缺损；再问疼痛是否会放射到面部或头部；最后，了解患者平时是否经常食用酸性食物或饮料。
+
+患者通过选择或输入的方式回答这些问题，AI助手会实时分析每一个回答。整个过程就像与一位专业医生进行初步问诊，既全面又高效。
+
+问答结束后，系统自动生成一份专业的“诊前摘要”。摘要中包含：症状描述、持续时间、疼痛程度、观察结果、初步诊断、护理建议以及推荐专家。
+
+这份摘要不仅能精准推荐对症专家，还会直接同步至医生的工作面板，当患者到达医院后，接诊医生已经通过工作面板了解了患者的基本情况和症状，无需再花时间反复询问，直接进入针对性的诊断和治疗方案制定，大大提升了诊疗效率和患者体验。
+
+
+在医疗保险理赔或司法鉴定场景中，证据的真实性压倒一切。我们为第三方机构设计了极具科技感的“验真控制台”，让验证过程变得简单而权威。
+
+操作人员只需将接收到的PDF病历或医学影像拖入校验区，或点击“上传”按钮选择文件，即可启动溯源程序。系统支持批量上传和验证多个文件，大大提高了工作效率。
+
+文件上传完成后，点击“开始验证”按钮，系统立即与区块链节点建立实时通讯。此时，后台日志终端开始滚动显示验证过程：首先进行沙箱环境初始化，确保验证过程的安全性；然后执行Merkle Tree路径检索，这是区块链技术中的核心验证机制；最后进行多节点背书验证，确保验证结果的共识性。
+绿色的滚动日志清晰地展示了指纹比对的全过程，包括文件哈希值、区块高度、存证时间、验证节点数等关键信息。当“验证通过”字样闪烁时，证明该文件与最初存证时的原始状态完全一致，未经过任何像素级的二次编辑或逻辑篡改。
+验证完成后，系统会生成详细的验证报告，包含文件哈希值、存证区块高度、存证时间戳、参与验证的节点数量以及完整的Merkle路径。这些信息不仅可以作为法律证据，还可以通过区块链浏览器进行公开查询，确保验证过程的透明性和可追溯性。
+除了文件验证，系统还支持证书验证功能。第三方机构可以输入证书编号或扫描二维码，系统会立即从区块链中检索证书信息，验证其真伪和有效性。这种透明、硬核的验证机制，彻底消除了第三方机构对医疗文书真实性的疑虑，为医疗保险理赔和司法鉴定提供了坚实的技术支撑。
+
+ 从智能分诊的便捷，到存证流程的严谨，再到验真中心的权威，“医点就通”不仅是一套管理工具，更是一套信任协议。我们通过技术手段，让医疗数据在安全的轨道上流动，让医疗行为在透明的监管下进行。
+医点就通，让医疗更智能、更可信。感谢您的观看，让我们共同定义数字医疗的未来。
+
+
+
+
+
+During the three-day Qingming holiday, both tourist numbers and tourism revenue witnessed a substantial surge, a phenomenon that can be largely attributed to the concurrent occurrence of the traditional tomb-sweeping festival and students' spring break in many regions, which collectively amplified the holiday's vitality and footfall.
+Preliminary data released by provincial tourism authorities indicates that both visitor volume and tourism earnings have achieved double-digit growth, reflecting a robust recovery in the sector following the gradual normalization of post-pandemic travel patterns.
+According to official statistics, by 3 p.m. on the second day of the Qingming holiday (Sunday), a total of 899 A-level tourist attractions across Sichuan Province had welcomed 5.77 million visitors, marking a 14.51% increase compared to the corresponding period in 2025. Concurrently, ticket revenue reached 60.74 million yuan (approximately 8.83 million US dollars), registering a year-on-year growth of 16.84%, which underscores the strong consumer demand for leisure travel during the holiday period.
+This year, the Qingming Festival falls on Sunday, and the three-day holiday period extends from Saturday to Monday, providing residents with ample time to engage in both traditional rituals and recreational activities.

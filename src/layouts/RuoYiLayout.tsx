@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation,Outlet } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, FileText, ShieldCheck, 
   History as HistoryIcon, BarChart3, 
@@ -9,16 +9,16 @@ import {
 import { cn } from '@/lib/utils';
 import { AuthContext } from '@/contexts/authContext';
 import { toast } from 'sonner';
-import navLogo from '@/picture/nav.png';
+import navLogo from '@/public/nav.png';
 
 // --- 1. HIS 模块导航 ---
-const HIS_MODULES = [
-  { label: '门诊挂号', id: 'reg' },
-  { label: '分诊叫号', id: 'triage' },
-  { label: '医生工作站', id: 'doctor', active: true },
-  { label: '收费管理', id: 'billing' },
-  { label: '药房管理', id: 'pharmacy' },
-];
+// const HIS_MODULES = [
+//   { label: '门诊挂号', id: 'reg' },
+//   { label: '分诊叫号', id: 'triage' },
+//   { label: '医生工作站', id: 'doctor', active: true },
+//   { label: '收费管理', id: 'billing' },
+//   { label: '药房管理', id: 'pharmacy' },
+// ];
 
 // --- 2. 角色配置 (🎨 颜色修复版) ---
 const ROLE_CONFIG = {
@@ -27,7 +27,7 @@ const ROLE_CONFIG = {
     logoText: '医点就通', 
     subLogoText: '智能诊疗决策系统', 
     // 侧边栏头像背景色
-    themeColor: 'bg-blue-600', 
+    themeColor: 'bg-[#001529]', 
     // 菜单选中时的背景 (高亮蓝)
     activeBg: 'bg-blue-600 shadow-blue-900/50', 
     headerTitle: '门诊医生工作站',
@@ -45,7 +45,7 @@ const ROLE_CONFIG = {
     logoText: '医点就通',
     subLogoText: '个人健康信托',
     // 侧边栏头像背景色
-    themeColor: 'bg-emerald-500',
+    themeColor: 'bg-emerald-900',
     // 菜单选中时的背景 (鲜艳绿)
     activeBg: 'bg-emerald-500 shadow-emerald-900/50',
     headerTitle: '我的健康空间',
@@ -62,7 +62,7 @@ const ROLE_CONFIG = {
     logoText: '医点就通', 
     subLogoText: '全院数据监管驾驶舱', 
     // 侧边栏头像背景色
-    themeColor: 'bg-violet-600', 
+    themeColor: 'bg-violet-900', 
     // 菜单选中时的背景 (亮紫色，非常显眼)
     activeBg: 'bg-violet-600 shadow-violet-900/50',
     headerTitle: '医疗质量与存证管理平台', 
@@ -77,7 +77,8 @@ const ROLE_CONFIG = {
   }
 };
 
-export default function RuoYiLayout({ children }: { children: React.ReactNode }) {
+export default function RuoYiLayout() {
+  //useNavigate，用于导航到指定路由
   const navigate = useNavigate();
   const location = useLocation();
   const { role, logout } = useContext(AuthContext);
@@ -89,16 +90,18 @@ export default function RuoYiLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     const date = new Date();
     const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+    //getMonth()从0开始，所以要加1月
+    //为什么getDay的0对应周天
     setCurrentDate(`${date.getMonth() + 1}月${date.getDate()}日 星期${weekdays[date.getDay()]}`);
   }, []);
 
-  const handleModuleClick = (mod: typeof HIS_MODULES[0]) => {
-    if (!mod.active) {
-      toast.info(`正在跳转至 [${mod.label}] ...`, {
-        description: '演示环境仅开放“医生工作站”核心模块'
-      });
-    }
-  };
+  // const handleModuleClick = (mod: typeof HIS_MODULES[0]) => {
+  //   if (!mod.active) {
+  //     toast.info(`正在跳转至 [${mod.label}] ...`, {
+  //       description: '演示环境仅开放“医生工作站”核心模块'
+  //     });
+  //   }
+  // };
 
   return (
     <div className="flex h-screen w-full bg-[#f0f2f5] overflow-hidden font-sans">
@@ -107,14 +110,16 @@ export default function RuoYiLayout({ children }: { children: React.ReactNode })
         className={cn(
           "text-white flex flex-col shadow-2xl z-30 transition-all duration-300 ease-in-out relative overflow-hidden",
           collapsed ? "w-[70px]" : "w-[240px]",
-          "bg-[#001529]" // 侧边栏保持深蓝底色，这是 B 端系统的基调
+          config.themeColor
+
+          // "bg-[#001529]" // 侧边栏保持深蓝底色，这是 B 端系统的基调
         )}
       >
         {/* 背景装饰：稍微加点噪点纹理，显得有质感 */}
-        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 pointer-events-none"></div>
+        <div className="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-25 pointer-events-none "></div>
         
         {/* 动态光晕：根据角色颜色变化，让侧边栏不那么死板 */}
-        <div className={cn("absolute -top-20 -right-20 w-40 h-40 rounded-full blur-[80px] opacity-20", config.themeColor)}></div>
+        <div className={cn("absolute -bottom-20 -right-20 w-40 h-40 rounded-full blur-[80px] opacity-80", config.themeColor)}></div>
 
         {/* Logo 区域 */}
         <div className={cn(
@@ -123,9 +128,8 @@ export default function RuoYiLayout({ children }: { children: React.ReactNode })
         )}>
           <div className={cn(
             "flex-shrink-0 w-16 h-8 rounded-lg flex items-center justify-center shadow-lg bg-gradient-to-br from-white/20 to-white/5 backdrop-blur-sm border border-white/10",
-            // Logo 图标也跟随主题色
-            config.themeColor.replace('bg-', 'text-white ') 
           )}>
+            
             <img src={navLogo} alt="医点就通logo" />
           </div>
           
@@ -153,6 +157,7 @@ export default function RuoYiLayout({ children }: { children: React.ReactNode })
                   "flex items-center cursor-pointer transition-all rounded-lg h-[44px] group relative",
                   isActive 
                     ? `${config.activeBg} text-white shadow-md font-medium` 
+                    //
                     : "text-slate-400 hover:text-white hover:bg-white/10",
                   collapsed ? "justify-center px-0" : "px-3"
                 )}
@@ -189,7 +194,7 @@ export default function RuoYiLayout({ children }: { children: React.ReactNode })
           {/* HIS 伪装导航 (医生端特供) */}
           {role === 'doctor' && (
             <div className="absolute left-1/2 transform -translate-x-1/2 hidden 2xl:flex items-center p-1 bg-slate-100 rounded-lg border border-slate-200">
-              {HIS_MODULES.map((mod) => (
+              {/* {HIS_MODULES.map((mod) => (
                 <button
                   key={mod.id}
                   onClick={() => handleModuleClick(mod)}
@@ -202,7 +207,7 @@ export default function RuoYiLayout({ children }: { children: React.ReactNode })
                 >
                   {mod.label}
                 </button>
-              ))}
+              ))} */}
             </div>
           )}
 
@@ -241,7 +246,10 @@ export default function RuoYiLayout({ children }: { children: React.ReactNode })
         </header>
 
         <main className="flex-1 overflow-auto bg-[#F8FAFC] p-6 relative">
-          {children}
+          {/* {children} */}
+          {/* 渲染子组件，根据路由匹配渲染对应的组件 */}
+          {/* //显示子路由内容 ：在父路由组件中创建一个"占位符"，当匹配到子路由时，子路由的组件会渲染到这个位置 */}
+          <Outlet/>
         </main>
       </div>
     </div>

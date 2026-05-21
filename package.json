@@ -3,12 +3,12 @@
   "private": true,
   "version": "0.0.1",
   "type": "module",
-  "scripts": {
-    "dev:client": "vite --host --port 3000",
-    "dev": "pnpm dev:client",
-    "build:client": "vite build --outDir dist/static",
-    "build": "rm -rf dist && pnpm build:client && cp package.json dist && touch dist/build.flag"
-  },
+"scripts": {
+  "dev:client": "vite --host --port 3000",
+  "dev": "pnpm dev:client",
+  "build:client": "vite build",
+  "build": "pnpm build:client"
+},
   "dependencies": {
     "clsx": "^2.1.1",
     "framer-motion": "^12.9.2",

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import RuoYiLayout from '@/layouts/RuoYiLayout';
+// import RuoYiLayout from '@/layouts/RuoYiLayout';
 import { 
   Folder, FileText, Search, Filter, MoreVertical, 
   Star, Clock, Trash2, Cloud, Download 
@@ -26,7 +26,7 @@ export default function RecordManagement() {
   ];
 
   return (
-    <RuoYiLayout>
+    <>
       <div className="flex h-[calc(100vh-140px)] bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {/* 左侧：文件夹导航 (Explorer Sidebar) */}
         <div className="w-64 bg-gray-50 border-r border-gray-200 flex flex-col">
@@ -119,6 +119,6 @@ export default function RecordManagement() {
           </div>
         </div>
       </div>
-    </RuoYiLayout>
+    </>
   );
 }

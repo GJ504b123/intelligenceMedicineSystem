@@ -1,9 +1,9 @@
-import RuoYiLayout from '@/layouts/RuoYiLayout';
+// import RuoYiLayout from '@/layouts/RuoYiLayout';
 import { ShieldCheck, Hash, Blocks, CheckCircle2, Activity, Server, Database } from 'lucide-react';
 
 export default function VerifyCenter() {
   return (
-    <RuoYiLayout>
+    <>
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-800">区块链存证控制台</h1>
         <p className="text-gray-500 mt-1">FISCO BCOS 联盟链节点实时监控中...</p>
@@ -82,7 +82,7 @@ export default function VerifyCenter() {
           ))}
         </div>
       </div>
-    </RuoYiLayout>
+    </>
   );
 }
 

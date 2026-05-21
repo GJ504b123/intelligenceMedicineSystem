@@ -37,7 +37,10 @@ export default function Login() {
 
   // 角色选择处理
   const handleRoleSelect = (role: UserRole): void => {
+    console.log('1.当前角色role：',role)
+
     setSelectedRole(role);
+    console.log('2.你点击后的角色role：',role)
   };
 
   // 模拟用户数据库
@@ -66,22 +69,28 @@ export default function Login() {
 
   // 登录处理函数
   const handleLogin = (e: React.FormEvent): void => {
-    e.preventDefault();
-    
+    e.preventDefault();//1.防止默认提交,导致提交以后所有页面刷新
+    console.log('5. 当前角色:',selectedRole)
+    console.log('6. 当前email:',email)
+    console.log('7. 当前密码:',password)
     if (!email || !password) {
+      console.log("邮箱或密码为空")
       toast('请填写所有必填字段');
       return;
     }
 
     // 模拟登录验证
     const mockUser = mockUsers[selectedRole];
+    // console.log("8. 模拟数据库里取出的正确数据信息",mockUser)
     if (email === mockUser.email && password === mockUser.password) {
       // 存储用户信息到本地存储
       localStorage.setItem('userInfo', JSON.stringify(mockUser));
-      
+      // console.log('9. 已存到 localStorage 的用户信息：', JSON.parse(localStorage.getItem('userInfo') || '{}'));
+      // console.log("10.",localStorage)
       // 类型断言：假设setAuthenticated接受boolean和UserRole
-      (setAuthenticated as (auth: boolean, role: UserRole) => void)(true, selectedRole);
-      
+      setAuthenticated(true, selectedRole);
+
+      // 等价于 setAuthenticated(true, selectedRole);
       // 根据角色重定向
       switch (selectedRole) {
         case 'doctor':
@@ -101,8 +110,8 @@ export default function Login() {
     } else {
       toast('邮箱或密码不正确');
     }
-  };
 
+  };
   // 密码显示切换
   const toggleShowPassword = (): void => {
     setShowPassword(!showPassword);
@@ -135,7 +144,7 @@ export default function Login() {
           className="absolute inset-0 bg-cover bg-center"
           style={{ 
             // backgroundImage: '1/src/picture/1-2.jpg',
-            backgroundImage: 'url("/src/picture/1-2.jpg")', // 测试用图片
+            backgroundImage: 'url("/1-2.jpg")', // 测试用图片
             filter: 'brightness(0.9)' // 调整背景亮度
           }}
         ></div>
@@ -238,12 +247,15 @@ export default function Login() {
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                     <input
                       type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      value={email}//绑定状态，让输入框显示变量内容
+                      onChange={(e) =>{ 
+                        console.log("3. 你正在输入的邮箱:" ,e.target.value)
+                        setEmail(e.target.value)}}
                       placeholder="请输入邮箱"
                       className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] transition-colors"
                       required
                       aria-required="true"
+                      // 无障碍属性告诉「屏幕阅读器」：这个输入框是必填的
                     />
                   </div>
                   
@@ -252,7 +264,10 @@ export default function Login() {
                     <input
                       type={showPassword ? "text" : "password"}
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange = {(e) =>{
+                        console.log(e.target.value)
+                        setPassword(e.target.value)
+                      }}
                       placeholder="请输入密码"
                       className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] transition-colors"
                       required
@@ -323,6 +338,7 @@ export default function Login() {
                       onClick={() => handleQuickLogin('doctor')}
                       className="py-2 px-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm text-center"
                       aria-label="使用医生示例账号登录"
+                      // 无障碍人士专用
                     >
                       医生示例账号
                     </button>
@@ -352,3 +368,17 @@ export default function Login() {
     </div>
   );
 }
+
+/* 毛玻璃效果的实现
+<div>
+  <div >
+    存放背景照片，在内容之下  
+    div：放图片
+    div：放一个黑色半透明罩
+  </div>
+  <div>
+    存放内容
+  </div>
+
+</div>
+*/
